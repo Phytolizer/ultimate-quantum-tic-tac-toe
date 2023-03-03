@@ -1,6 +1,7 @@
 const std = @import("std");
 const c = @import("c.zig");
 const sdl = @import("sdl.zig");
+const board = @import("board.zig");
 
 pub fn main() void {
     // Using a separate `run()` function avoids two issues:
@@ -61,6 +62,9 @@ fn run() !void {
         window_height,
     ));
     defer c.SDL_DestroyTexture(texture);
+
+    var play_board = board.SuperBoard{};
+    std.debug.print("{any}\n", .{play_board});
 
     mainLoop: while (true) {
         var event: c.SDL_Event = undefined;
