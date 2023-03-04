@@ -1,7 +1,8 @@
 const std = @import("std");
 const c = @import("c.zig");
 const sdl = @import("sdl.zig");
-const board = @import("board.zig");
+const SuperBoard = @import("SuperBoard.zig");
+const View = @import("View.zig");
 
 pub fn main() void {
     // Using a separate `run()` function avoids two issues:
@@ -30,8 +31,8 @@ pub fn main() void {
     run() catch std.process.exit(1);
 }
 
-const window_width = 640;
-const window_height = 480;
+pub const window_width = 640 * 2;
+pub const window_height = 480 * 2;
 
 fn run() !void {
     try sdl.check_code(c.SDL_Init(c.SDL_INIT_VIDEO));
@@ -63,8 +64,9 @@ fn run() !void {
     ));
     defer c.SDL_DestroyTexture(texture);
 
-    var play_board = board.SuperBoard{};
+    var play_board = SuperBoard{};
     std.debug.print("{any}\n", .{play_board});
+    var view = View.init(&play_board);
 
     mainLoop: while (true) {
         var event: c.SDL_Event = undefined;
@@ -77,13 +79,13 @@ fn run() !void {
 
         try sdl.check_code(c.SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255));
         try sdl.check_code(c.SDL_RenderClear(renderer));
-        try renderToTexture(texture);
+        try renderToTexture(texture, &view);
         try sdl.check_code(c.SDL_RenderCopy(renderer, texture, null, null));
         c.SDL_RenderPresent(renderer);
     }
 }
 
-fn renderToTexture(texture: *c.SDL_Texture) !void {
+fn renderToTexture(texture: *c.SDL_Texture, view: *View) !void {
     var pixels: ?*anyopaque = undefined;
     var pitch: c_int = undefined;
     try sdl.check_code(c.SDL_LockTexture(texture, null, &pixels, &pitch));
@@ -97,11 +99,13 @@ fn renderToTexture(texture: *c.SDL_Texture) !void {
         pitch,
     );
     defer c.cairo_surface_destroy(surface);
-    const cr = c.cairo_create(surface);
+    const cr = c.cairo_create(surface).?;
     defer c.cairo_destroy(cr);
 
     c.cairo_set_source_rgb(cr, 1.0, 1.0, 1.0);
     c.cairo_paint(cr);
+
+    try view.render(cr);
 
     const font_name = "Sans Bold 100";
     const layout = c.pango_cairo_create_layout(cr);
