@@ -1,0 +1,20 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "name": "ultimate-quantum-tic-tac-toe",
+  "version-semver": "0.0.1",
+  "dependencies": [
+    {
+      "name": "sdl2",
+      "version>=": "2.26.2"
+    },
+    {
+      "name": "stb",
+      "version>=": "2021-09-10"
+    },
+    {
+      "name": "cairo",
+      "version>=": "1.17.8"
+    }
+  ],
+  "builtin-baseline": "8875aa3cd9b3b62e7c7207ee172cebd0c944abca"
+}
